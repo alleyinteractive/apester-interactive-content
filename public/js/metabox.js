@@ -52,11 +52,11 @@
     }
 
     function editInteraction(id) {
-        modal.open(baseUrl + '/#/editor/' + id + '?access_token=' + window.authToken);
+        modal.open(baseUrl + '/#/editor/' + encodeURIComponent( id ) + '?access_token=' + encodeURIComponent( window.authToken ) );
     }
 
     function addInteraction() {
-        modal.open(baseUrl + '/#/editor/new' + '?access_token=' + window.authToken);
+        modal.open(baseUrl + '/#/editor/new?access_token=' + encodeURIComponent( window.authToken ) );
     }
 
     function messageHandler(event) {
