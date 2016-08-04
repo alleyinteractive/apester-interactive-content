@@ -10,7 +10,8 @@ class QmerceWidget extends WP_Widget {
     /**
      * Constructor function
      */
-    public function __construct() {
+    public function QmerceWidget()
+    {
         $this->tagComposer = new QmerceTagComposer();
         parent::__construct('qmerce_widget', 'Apester Challenge Widget', array('description' => 'Chosen automated Apester challenge from your `My Stuff` inventory'));
     }
@@ -20,7 +21,8 @@ class QmerceWidget extends WP_Widget {
      * @param array $args
      * @param array $instance
      */
-    public function widget( $args, $instance ) {
+    public function widget( $args, $instance )
+    {
         echo $this->tagComposer->composeAutomationTag();
     }
 }

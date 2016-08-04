@@ -105,38 +105,45 @@ class Qmerce_Settings
     /**
      * Callback for the postTypes settings field
      */
-    public function postTypesCb() {
-        $post_types = $this->getPostTypes();
-        if ( empty( $this->options['post_types'] ) || ! is_array( $this->options['post_types'] ) ) {
-            $this->options['post_types'] = array();
-        }
+    public function postTypesCb()
+    {
+        $postTypes = $this->getPostTypes();
 
-        foreach ( $post_types as $post_type ) {
+        foreach($postTypes as $postType) {
+            $checked = '';
+
+            if ( in_array( $postType->name, $this->options['post_types'] ) ) {
+                $checked = 'checked';
+            }
+
             printf(
-                '<input type="checkbox" name="qmerce-settings-admin[post_types][]" value="%s" %s /> %s ',
-                esc_attr( $post_type->name ),
-                checked( in_array( $post_type->name, $this->options['post_types'] ), true, false ),
-                esc_html( $post_type->label )
+                '<input type="checkbox" name="qmerce-settings-admin[post_types][]" value="%s" ' . $checked . '/> ' . $postType->label . ' ',
+                $postType->name
             );
         }
     }
 
-    public function automationPostTypeCb() {
-        $post_types = $this->getPostTypes();
-        $automation_post_types = $this->getAutomationPostTypes();
+    public function automationPostTypeCb()
+    {
+        $postTypes = $this->getPostTypes();
 
-        foreach ( $post_types as $post_type ) {
+        foreach($postTypes as $postType) {
+            $checked = '';
+
+            if ( in_array( $postType->name, $this->getAutomationPostTypes() ) ) {
+                $checked = 'checked';
+            }
+
             printf(
-                '<input type="checkbox" name="qmerce-settings-admin[automation_post_types][]" value="%s" %s /> %s ',
-                esc_attr( $post_type->name ),
-                checked( in_array( $post_type->name, $automation_post_types ), true, false ),
-                esc_html( $post_type->label )
+                '<input type="checkbox" name="qmerce-settings-admin[automation_post_types][]" value="%s" ' . $checked . '/> ' . $postType->label . ' ',
+                $postType->name
             );
         }
     }
 
-    private function getAutomationPostTypes() {
-        if ( ! empty( $this->options['automation_post_types'] ) ) {
+    private function getAutomationPostTypes()
+    {
+        if ($this->options['automation_post_types']) {
             return $this->options['automation_post_types'];
         }
 
@@ -169,8 +176,16 @@ class Qmerce_Settings
      * Retrieves the names of all available post types in array
      * @return array
      */
-    private function getPostTypesNames() {
-        return wp_list_pluck( $this->getPostTypes(), 'name' );
+    private function getPostTypesNames()
+    {
+        $postTypes = $this->getPostTypes();
+        $postNames = array();
+
+        foreach ( $postTypes as $postType ) {
+            array_push( $postNames, $postType->name );
+        }
+
+        return $postNames;
     }
 
     /**
@@ -210,29 +225,23 @@ class Qmerce_Settings
      * @param array $input Contains all settings fields as array keys
      * @return array|string
      */
-    public function sanitize( $input ) {
-        $new_input = array();
+    public function sanitize($input)
+    {
+        $newInput = array( 'post_types' => $this->sanitizePostTypes( $input['post_types'] ) );
+        $newInput['automation_post_types'] = $this->sanitizePostTypes( $input['automation_post_types'] );
 
-        if ( isset( $input['post_types'] ) ) {
-            $new_input['post_types'] = $this->sanitizePostTypes( $input['post_types'] );
-        }
-
-        if ( isset( $input['automation_post_types'] ) ) {
-            $new_input['automation_post_types'] = $this->sanitizePostTypes( $input['automation_post_types'] );
-        }
-
-        if ( isset( $input['auth_token'] ) ) {
-            if ( ! $this->validateToken( $input['auth_token'] ) ) {
+        if( isset( $input['auth_token'] ) ) {
+            if ( !$this->validateToken( $input['auth_token'] ) ) {
                 return $this->preserveValue();
             }
 
             // Delete the unused user-id value.
             delete_option( 'qmerce-user-id' );
 
-            $new_input['auth_token'] = sanitize_text_field( $input['auth_token'] );
+            $newInput['auth_token'] = sanitize_text_field( $input['auth_token'] );
         }
 
-        return $new_input;
+        return $newInput;
     }
 
     /**
@@ -246,21 +255,21 @@ class Qmerce_Settings
     /**
      * Print the helper text.
      */
-    public function printHelperInfo() {
+    public function printHelperInfo()
+    {
         printf(
-            'Get a token at <a href="%s" target="_blank">Apester.com</a> (you can find it in your <a href="%s" target="_blank">user settings</a>.)',
-            esc_url( APESTER_EDITOR_BASEURL . '/register' ),
-            esc_url( APESTER_EDITOR_BASEURL . '/user/settings' )
+            'Get a token at <a href="' . APESTER_EDITOR_BASEURL . '/register" target=_blank>Apester.com</a> (you can find it in your user <a href="' . APESTER_EDITOR_BASEURL . '/user/settings" target=_blank>settings</a>.)'
         );
     }
 
     /**
      * Get the settings option array and print one of its values
      */
-    public function authTokenCallback() {
+    public function authTokenCallback()
+    {
         printf(
-            '<input type="text" id="auth_token" name="qmerce-settings-admin[auth_token]" value="%s" size="28" />',
-            isset( $this->options['auth_token'] ) ? esc_attr( $this->options['auth_token'] ) : ''
+            '<input type="text" id="auth_token" name="qmerce-settings-admin[auth_token]" value="%s" size="24" />',
+            isset($this->options['auth_token'] ) ? esc_attr( $this->options['auth_token'] ) : ''
         );
     }
 }
