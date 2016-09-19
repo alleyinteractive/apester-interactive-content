@@ -70,7 +70,7 @@ class QmerceAutomation
     {
         $qmerceSettings = get_option( 'qmerce-settings-admin' );
 
-        if ( !$qmerceSettings['automation_post_types'] ) {
+        if ( empty( $qmerceSettings['automation_post_types'] ) ) {
             return array();
         }
 
